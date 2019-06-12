@@ -34,17 +34,17 @@ console.log(`Free Memory: ${freeMemory}`);
 
 
 //#####################################################
-// ./ indicate the current folder. it tels
+// ./ indicate the current folder. it tells
 //node in current folder look for logger file
 //if it was in a parent folder you would need
 // ../parentFolderName/siblingFolderName/fileName
 // const logger = require('./logger');
 
-// console.log('Salam Shahram');
+ console.log('Salam Shahram');
 
-// function sayHello(name) {
-//     console.log('Hello' + name);
-// }
+ function sayHello(name) {
+     console.log('Hello' + name);
+ }
 
 // //sayHello('Mosh');
 // console.log(window);
