@@ -20,11 +20,17 @@ const express = require('express');
 const app = express(); //in fact app is an alias for the 
                        //express fucntion
 
+const logger = require('./logger');
+const auth = require('./auth');
+
  //express.json() returns a piece of middleware
  //and then we call app.use() to use that middleware in the
  //request processing pipeline
 app.use(express.json());
-
+console.log(logger);
+app.use(logger);
+console.log(auth);
+app.use(auth);
 
 const courses = [
     {id: 1, name: 'course1'},
