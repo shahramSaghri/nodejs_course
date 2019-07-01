@@ -15,18 +15,169 @@
  * example.
  */
 
-const Joi = require('joi');
+
 const express = require('express');
 const app = express(); //in fact app is an alias for the 
                        //express fucntion
 
+//process is an object that contains
+//information about current process
+const myProcess = process.env.NODE_ENV;
+
+
+
+/**
+ * the following config module is part of the 
+ * npm config package that allows you to configure your
+ * application with a series of json files that are
+ * contained in the config folder in this application
+ */
+const config = require('config')
+const Joi = require('joi');
+const morgan = require('morgan');
+const helmet = require('helmet');
+
+/**
+ * The following require('debug') statement returns a fucntion
+ * so we can pass an argument when we are importing the
+ * module such that, require('debug')('app:startup')
+ * the above arquement, 'app:startup", is an arbitrary 
+ * namespace which you can call anything you want, and
+ * we define it for debuging. so when we call this function
+ * we get a funtion for debugging messages in the namespace
+ * which we just indroduces. for example 
+ */
+const startupDebugger = require('debug')('app:startup');
+/**
+ * We also can have multiple debugger for different purposes
+ * for example we can potencially have a debugger for
+ * debugging database related messages
+ */
+const dbDebugger = require('debug')('app:db');
+
+
 const logger = require('./logger');
 const auth = require('./auth');
+
+
+/**
+ * To use the pug templating engin, First: we need to set
+ * the view engine property in to the templating engine
+ * that we are going to use. Here we want to use
+ * pug for tamplating enging so we set the view engine
+ * property as follow:
+ * with the following statement express internally
+ * loads the pug module so we don't need to use
+ * .require().
+ */
+app.set('view engine', 'pug');
+/**
+ * if you want to override a path to a template
+ * you can do the following optional setting.
+ * in the following statement 'view' is the name of the 
+ * property and the value (second argument) is the path 
+ * where we store the template. The default value 
+ * for the path is './views' meaning that you need to 
+ * put all your views/templates inside a folder named
+ * views which you need to create in the root of the
+ * application. Look inside the views folder.
+ */
+app.set('views', './views')
 
  //express.json() returns a piece of middleware
  //and then we call app.use() to use that middleware in the
  //request processing pipeline
 app.use(express.json());
+
+
+/**
+ * Both following statements display the environment
+ * on the console. app.get('env') however uses
+ * process.env.NODE_ENV to determine the environment.
+ * if the process.env.NODE_ENV is not set, the first
+ * statement returns undefined but the second statement
+ * retuns development by default.
+ */
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`)
+console.log(`app: ${app.get('env')}`);
+
+
+/**
+ * Configuration examples. Note that the following 
+ * configurations use the 'config' module that is provided
+ * by npm config package.
+ */
+
+ /**
+  * The follwoing config object looks at various sources
+  * to find a value for the given configuration. The 
+  * source can be a json file, config file, environment
+  * variable it can also be a comand line arqument to know
+  * more look at the npm config package documentdation
+  */
+ console.log('Application Name: ' + config.get('name'));
+ console.log('Mail Server: ' + config.get('mail.host'));
+ console.log('Mail Password: ' + config.get('mail.password'))
+
+
+/**
+ * eigther of above mothods can be used to anable or disable
+ * certain features in different environments.
+ * for example if we want to use morgan() just in development
+ * environment:
+ */
+
+//Morgan logs HTTP request
+//you have different logging levels
+//you can configure morgan to log
+//in to a log file
+/**
+ * Instead using the console.log to debug, fowllowing we
+ * are going to use the startupDebugger that we intruduced
+ * above, such that.
+ */
+if(app.get('env') === 'development') {
+    app.use(morgan('tiny'));
+    //console.log('Morgan enabled...');
+    startupDebugger('Morgan enabled...'); 
+}
+
+/**
+ * here we can have some database work and then
+ * use the dbDebugger which we defined above to 
+ */
+ 
+ dbDebugger('Connected to the database...');
+
+ /**
+  * Using the above debugging functions we can detrermine
+  * what kind of debugging information we need from the
+  * terminal to do so in the terminal we can execute
+  * the follwoing statement:
+  * export DEBUG=app:startup, which displays only the
+  * debugging messages that are part of the
+  * app:startup namespace. If you don't want to disply
+  * the debugging messages on the console any mode 
+  * you can simply reset the DEBUG environment variable to
+  * noting such that, export DEBUG=  .
+  * On the other hand if you like to display the messages
+  * from more that one namespace simply set the DEBUG 
+  * environment variable to all of them and separate them
+  * with comma such that.
+  * export DEBUG=app:startup,app:db.
+  * if you want all the name spaces which their name
+  * begins with app: you can, export DEBUG=app:* instead
+  * listing them one by one
+  */
+
+//Third party middleware
+app.use(helmet());
+
+//Other express built-in middleware
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+
+//User defined middleware
 console.log(logger);
 app.use(logger);
 console.log(auth);
@@ -58,8 +209,22 @@ const courses = [
  * Refrence version 4
  *  */ 
 
+ /**
+  * In the following endpoint instead sending a json
+  * object we want to send html markup to the client
+  * so we are using the templating engine that we 
+  * defined above. Notice that instead .send() method
+  * we are using .render() method. as the first
+  * argument of the render method we pass the name 
+  * of the template that we want to render that is
+  * index.pug but we ignore pug we pass just the index.
+  * As a second argument, however, we pass an object that
+  * infact assigns values to the parameters that we
+  * defined in our template.
+  */
 app.get('/', (req, res) => {
-    res.send('Hello World!!!');
+    //res.send('Hello World!!!');
+    res.render('index', { title: 'My Express App', message: 'Hello'})
 });
 
 app.get('/api/courses', (req, res) => {
