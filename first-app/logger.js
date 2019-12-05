@@ -1,4 +1,5 @@
-var x =;
+const EventEmitter = require('events');
+//const emitter = new EventEmitter();
 
 //This moduls is for logging messages
 
@@ -6,17 +7,25 @@ var x =;
 //following logging service to log our messages
 var url = 'http://mylogger.io/log';
 
-//
-function log(message) {
-    //Send an http request
-    console.log(message);
+
+class Logger extends EventEmitter {
+    //
+    log(message) {
+        //Send an http request
+        console.log(message);
+    
+        //Rasie an event
+        this.emit('messageLogged', {id: 1, url: 'http://'})
+        
+    }
+
 }
 
 //Follwoing we are adding a function named
 //log to the export property of module opject
 //that is an nested js object intself, and we 
 //are assigning the above log function to it.
-module.exports = log
+module.exports = Logger;
 
 //Making a function or variable exportable is like
 //make it public in opp context the other entities

@@ -20,7 +20,7 @@ const express = require('express');
 const app = express(); //in fact app is an alias for the 
                        //express fucntion
 
-//process is an object that contains
+//process is a global object that contains
 //information about current process
 const myProcess = process.env.NODE_ENV;
 
