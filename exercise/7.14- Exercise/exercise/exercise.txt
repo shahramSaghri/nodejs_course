@@ -1,0 +1,11 @@
+- Description of the folloing cli command:
+    - mongoimport is used to import data into a mongo database.
+    - Flag --db is used to specify the name of the databas
+    - Flag --collection
+    - Flag --file spesifies the folder name where you stored the json object which you need to import
+    - Flag --jsonArray, is required in this case because the json objects wyou want to improt are
+             stroed in an array.
+mongoimport --db mongo-exercises --collection courses --drop --file exercise-data.json --jsonArray
+
+***In linux to be able to use mongoimport we need to install monto-tools in Linux as follow
+sudo apt install mongo-tools
